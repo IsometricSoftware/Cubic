@@ -15,12 +15,33 @@ public struct Sphere : IPrimitive
 
     public Sphere(int rings, int segments, float radius = 0.5f)
     {
+        // Make sure the rings and segments count is in range
+        if (rings < 1) 
+            rings = 1;
+        if (segments < 3)
+            segments = 3;
+
         int vertexCount = 2 * segments + rings * (segments + 1);
         _vertices = new VertexPositionTextureNormal[vertexCount];
 
         int indexCount = 6 * segments * rings;
         _indices = new uint[indexCount];
 
+        GenerateVertices(rings, segments, radius);
+        GenerateIndices(rings, segments, vertexCount);
+    }
+
+    public Sphere()
+    {
+        _vertices = new VertexPositionTextureNormal[10];
+        _indices = new uint[18];
+
+        GenerateVertices(1, 3, 0.5f);
+        GenerateIndices(1, 3, 10);
+    }
+
+    void GenerateVertices(int rings, int segments, float radius)
+    {
         float latitudeSpacing = 1.0f / (rings + 1);
         float ongitudeSpacing = 1.0f / segments;
 
@@ -44,7 +65,7 @@ public struct Sphere : IPrimitive
                 float phi = 2.0f * MathF.PI * u;
                 Vector2 texCoords = new Vector2(u, v);
                 Vector3 vertexPosition = new Vector3(radius * MathF.Sin(theta) * MathF.Sin(phi), radius * MathF.Cos(theta), radius * MathF.Sin(theta) * MathF.Cos(phi));
-                _vertices[currentVertex++] = new VertexPositionTextureNormal(vertexPosition, texCoords, Vector3.Normalize(Vector3.UnitY));
+                _vertices[currentVertex++] = new VertexPositionTextureNormal(vertexPosition, texCoords, Vector3.Normalize(vertexPosition));
             }
         }
 
@@ -52,9 +73,12 @@ public struct Sphere : IPrimitive
         for (int i = 0; i < segments; i++)
         {
             Vector2 texCoords = new Vector2((i + 0.5f) * ongitudeSpacing, 1.0f);
-            _vertices[currentVertex++] = new VertexPositionTextureNormal(-Vector3.UnitY * radius, texCoords, Vector3.UnitY);
+            _vertices[currentVertex++] = new VertexPositionTextureNormal(-Vector3.UnitY * radius, texCoords, -Vector3.UnitY);
         }
+    }
 
+    void GenerateIndices(int rings, int segments, int vertexCount)
+    {
         int currentIndex = 0;
 
         // Generate the indices for the top cap
