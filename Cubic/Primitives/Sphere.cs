@@ -108,8 +108,8 @@ public struct Sphere : IPrimitive
         for (int i = 0; i < segments; i++)
         {
             _indices[currentIndex++] = (uint)(vertexCount - segments + i);
-            _indices[currentIndex++] = (uint)(vertexCount - segments - (segments + 1) + i);
-            _indices[currentIndex++] = (uint)(vertexCount - segments - (segments) + i);
+            _indices[currentIndex++] = (uint)(vertexCount - 2 * segments - 1 + i);
+            _indices[currentIndex++] = (uint)(vertexCount - 2 * segments + i);
         }
     }
 }
